@@ -33,8 +33,14 @@ const ClientSegmentCircle: React.FC<ClientSegmentCircleProps> = ({
   };
 
   return (
-    <div className="relative flex items-center justify-center h-56">
-      <svg width="220" height="220" className="absolute">
+    <div style={{
+      position: 'relative',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '224px'
+    }}>
+      <svg width="220" height="220" style={{ position: 'absolute' }}>
         {segments.map((segment, index) => {
           const radius = getSegmentRadius(segment.priority);
           const strokeWidth = getSegmentWidth(segment.priority);
@@ -68,11 +74,12 @@ const ClientSegmentCircle: React.FC<ClientSegmentCircleProps> = ({
                 strokeDasharray={dashArray}
                 strokeLinecap="round"
                 transform={`rotate(${index * 50 - 90} 110 110)`}
-                className="transition-all duration-300 cursor-pointer"
                 style={{
                   opacity: opacity,
                   filter: hoveredSegment === segment.name ? 'brightness(1.2) drop-shadow(0 0 6px rgba(0,0,0,0.3))' : 'none',
-                  strokeWidth: hoveredSegment === segment.name ? strokeWidth + 2 : strokeWidth
+                  strokeWidth: hoveredSegment === segment.name ? strokeWidth + 2 : strokeWidth,
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
                 }}
                 onMouseEnter={() => onSegmentHover(segment.name)}
                 onMouseLeave={() => onSegmentHover(null)}
@@ -83,10 +90,28 @@ const ClientSegmentCircle: React.FC<ClientSegmentCircleProps> = ({
         })}
       </svg>
 
-      <div className="absolute bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg border-2 border-slate-200">
-        <div className="text-center">
-          <div className="text-xs font-bold text-slate-800">{segments.length}</div>
-          <div className="text-xs text-slate-500">seg.</div>
+      <div style={{
+        position: 'absolute',
+        backgroundColor: 'white',
+        borderRadius: '50%',
+        width: '48px',
+        height: '48px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+        border: '2px solid #e2e8f0'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontSize: '12px',
+            fontWeight: 'bold',
+            color: '#1f2937'
+          }}>{segments.length}</div>
+          <div style={{
+            fontSize: '12px',
+            color: '#6b7280'
+          }}>seg.</div>
         </div>
       </div>
     </div>

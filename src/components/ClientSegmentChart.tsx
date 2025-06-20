@@ -20,10 +20,29 @@ const ClientSegmentChart = () => {
 
   return (
     <>
-      <div className="w-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 shadow-lg border border-slate-200">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-slate-800">Client Segmentation</h3>
-          <div className="text-sm text-slate-600">
+      <div style={{
+        width: '100%',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+        borderRadius: '12px',
+        padding: '16px',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        border: '1px solid #e2e8f0'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '16px'
+        }}>
+          <h3 style={{
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#1f2937'
+          }}>Client Segmentation</h3>
+          <div style={{
+            fontSize: '14px',
+            color: '#4b5563'
+          }}>
             Total: {totalClients.toLocaleString('en-US')} clients
           </div>
         </div>
@@ -44,9 +63,18 @@ const ClientSegmentChart = () => {
           onSegmentClick={handleSegmentClick}
         />
 
-        <div className="mt-4 text-center">
-          <div className="text-xs text-slate-600">
-            <span className="text-blue-600 font-medium">Click segment to view client list</span>
+        <div style={{
+          marginTop: '16px',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            fontSize: '12px',
+            color: '#4b5563'
+          }}>
+            <span style={{
+              color: '#2563eb',
+              fontWeight: '500'
+            }}>Click segment to view client list</span>
           </div>
         </div>
       </div>

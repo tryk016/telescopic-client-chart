@@ -1,25 +1,41 @@
+
 import ClientSegmentChart from "@/components/ClientSegmentChart";
 import RevenueSegmentChart from "@/components/RevenueSegmentChart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Users, Target, Percent } from "lucide-react";
+
 const Index = () => {
-  return <div className="min-h-screen bg-slate-50 p-4">
-      <div className="max-w-[660px] mx-auto">
-        <h1 className="text-2xl font-bold text-slate-800 mb-6">Client Dashboard</h1>
+  return (
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f8fafc',
+      padding: '16px'
+    }}>
+      <div style={{
+        maxWidth: '660px',
+        margin: '0 auto'
+      }}>
+        <h1 style={{
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: '#1f2937',
+          marginBottom: '24px'
+        }}>Client Dashboard</h1>
         
         {/* Main segmentation chart */}
-        <div className="mb-6">
+        <div style={{ marginBottom: '24px' }}>
           <ClientSegmentChart />
         </div>
 
-        {/* Metrics */}
-        
-
         {/* Revenue segmentation chart */}
-        <div className="grid grid-cols-1 gap-6">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '24px'
+        }}>
           <RevenueSegmentChart />
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
