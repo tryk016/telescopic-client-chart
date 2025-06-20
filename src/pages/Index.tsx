@@ -1,6 +1,5 @@
 
 import ClientSegmentChart from "@/components/ClientSegmentChart";
-import SalesChart from "@/components/SalesChart";
 import RevenueSegmentChart from "@/components/RevenueSegmentChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Target, Percent } from "lucide-react";
@@ -71,9 +70,8 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Dodatkowe wykresy */}
+        {/* Wykres segmentacji przychodów */}
         <div className="grid grid-cols-1 gap-6">
-          <SalesChart />
           <RevenueSegmentChart />
         </div>
       </div>

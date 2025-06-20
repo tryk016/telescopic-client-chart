@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Users, TrendingUp, AlertTriangle, UserCheck, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -58,19 +59,18 @@ const ClientSegmentChart = () => {
   };
 
   const getSegmentRadius = (priority: number) => {
-    const baseRadius = 30;
-    const maxRadius = 120;
+    const baseRadius = 25;
+    const maxRadius = 100;
     return baseRadius + (priority - 1) * ((maxRadius - baseRadius) / 5);
   };
 
   const getSegmentWidth = (priority: number) => {
-    if (priority >= 4) return 18;
-    return 15;
+    if (priority >= 4) return 15;
+    return 12;
   };
 
   const getOpacity = (priority: number) => {
-    // Zewnętrzne okręgi (wyższy priorytet) mają mniejszą przezroczystość
-    return 1 - (priority - 1) * 0.15;
+    return 1 - (priority - 1) * 0.12;
   };
 
   const handleSegmentClick = (segment: ClientSegment) => {
@@ -88,9 +88,9 @@ const ClientSegmentChart = () => {
           </div>
         </div>
         
-        <div className="relative flex items-center justify-center h-64">
-          {/* Koncentryczne kręgi - układ teleskopowy z odwróconą kolejnością */}
-          <svg width="260" height="260" className="absolute">
+        <div className="relative flex items-center justify-center h-56">
+          {/* Koncentryczne kręgi - układ teleskopowy */}
+          <svg width="220" height="220" className="absolute">
             {segments.map((segment, index) => {
               const radius = getSegmentRadius(segment.priority);
               const strokeWidth = getSegmentWidth(segment.priority);
@@ -98,8 +98,7 @@ const ClientSegmentChart = () => {
               const percentage = (segment.count / totalClients) * 100;
               const opacity = getOpacity(segment.priority);
               
-              // Dla lepszej widoczności, minimalna długość łuku dla małych segmentów
-              const minArcLength = 0.1;
+              const minArcLength = 0.15;
               const arcLength = Math.max(percentage / 100, minArcLength);
               const dashArray = `${circumference * arcLength} ${circumference}`;
               
@@ -107,8 +106,8 @@ const ClientSegmentChart = () => {
                 <g key={segment.name}>
                   {/* Tło pierścienia */}
                   <circle
-                    cx="130"
-                    cy="130"
+                    cx="110"
+                    cy="110"
                     r={radius}
                     fill="none"
                     stroke="#E2E8F0"
@@ -118,19 +117,19 @@ const ClientSegmentChart = () => {
                   
                   {/* Aktywny segment */}
                   <circle
-                    cx="130"
-                    cy="130"
+                    cx="110"
+                    cy="110"
                     r={radius}
                     fill="none"
                     stroke={segment.color}
                     strokeWidth={strokeWidth}
                     strokeDasharray={dashArray}
                     strokeLinecap="round"
-                    transform={`rotate(${index * 60 - 90} 130 130)`}
+                    transform={`rotate(${index * 50 - 90} 110 110)`}
                     className="transition-all duration-300 cursor-pointer"
                     style={{
                       opacity: opacity,
-                      filter: hoveredSegment === segment.name ? 'brightness(1.2) drop-shadow(0 0 8px rgba(0,0,0,0.3))' : 'none',
+                      filter: hoveredSegment === segment.name ? 'brightness(1.2) drop-shadow(0 0 6px rgba(0,0,0,0.3))' : 'none',
                       strokeWidth: hoveredSegment === segment.name ? strokeWidth + 2 : strokeWidth
                     }}
                     onMouseEnter={() => setHoveredSegment(segment.name)}
@@ -143,67 +142,45 @@ const ClientSegmentChart = () => {
           </svg>
 
           {/* Centralny punkt z informacją */}
-          <div className="absolute bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg border-2 border-slate-200">
+          <div className="absolute bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg border-2 border-slate-200">
             <div className="text-center">
-              <div className="text-xs font-medium text-slate-600">Klienci</div>
-              <div className="text-sm font-bold text-slate-800">{segments.length}</div>
-              <div className="text-xs text-slate-500">segmentów</div>
+              <div className="text-xs font-bold text-slate-800">{segments.length}</div>
+              <div className="text-xs text-slate-500">seg.</div>
             </div>
           </div>
-
-          {/* Interaktywne etykiety */}
-          {segments.map((segment, index) => {
-            const angle = (index * 60) * (Math.PI / 180);
-            const labelRadius = getSegmentRadius(segment.priority) + 35;
-            const x = 130 + labelRadius * Math.cos(angle - Math.PI / 2);
-            const y = 130 + labelRadius * Math.sin(angle - Math.PI / 2);
-            
-            return (
-              <div
-                key={`label-${segment.name}`}
-                className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${
-                  hoveredSegment === segment.name ? 'scale-110 z-10' : 'z-0'
-                }`}
-                style={{ 
-                  left: x, 
-                  top: y,
-                  opacity: getOpacity(segment.priority)
-                }}
-                onMouseEnter={() => setHoveredSegment(segment.name)}
-                onMouseLeave={() => setHoveredSegment(null)}
-                onClick={() => handleSegmentClick(segment)}
-              >
-                <div className={`bg-white rounded-lg shadow-md p-2 border-2 cursor-pointer min-w-16 ${
-                  hoveredSegment === segment.name ? 'border-slate-400 shadow-lg' : 'border-slate-200'
-                }`} style={{ borderLeftColor: segment.color, borderLeftWidth: '4px' }}>
-                  <div className="flex items-center gap-1 mb-1">
-                    <div style={{ color: segment.color }}>{segment.icon}</div>
-                    <div className="text-xs font-medium text-slate-700">{segment.name}</div>
-                  </div>
-                  <div className="text-sm font-bold text-slate-800">
-                    {segment.count.toLocaleString('pl-PL')}
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {((segment.count / totalClients) * 100).toFixed(1)}%
-                  </div>
-                </div>
-              </div>
-            );
-          })}
         </div>
 
-        {/* Legenda priorytetów */}
-        <div className="mt-4 flex justify-center">
-          <div className="flex items-center gap-4 text-xs text-slate-600">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
-              <span>Najwyższy priorytet (centrum)</span>
+        {/* Uporządkowana lista segmentów */}
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          {segments.map((segment) => (
+            <div
+              key={segment.name}
+              className={`bg-white rounded-lg shadow-sm p-3 border-2 cursor-pointer transition-all duration-300 ${
+                hoveredSegment === segment.name ? 'border-slate-400 shadow-md transform scale-105' : 'border-slate-200'
+              }`}
+              style={{ borderLeftColor: segment.color, borderLeftWidth: '4px' }}
+              onMouseEnter={() => setHoveredSegment(segment.name)}
+              onMouseLeave={() => setHoveredSegment(null)}
+              onClick={() => handleSegmentClick(segment)}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <div style={{ color: segment.color }}>{segment.icon}</div>
+                <div className="text-sm font-medium text-slate-700">{segment.name}</div>
+              </div>
+              <div className="text-lg font-bold text-slate-800">
+                {segment.count.toLocaleString('pl-PL')}
+              </div>
+              <div className="text-xs text-slate-500">
+                {((segment.count / totalClients) * 100).toFixed(1)}%
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-r from-gray-400 to-gray-600"></div>
-              <span>Najniższy priorytet (zewnątrz)</span>
-            </div>
-            <div className="text-blue-600 font-medium">Kliknij segment aby zobaczyć listę klientów</div>
+          ))}
+        </div>
+
+        {/* Informacja o interakcji */}
+        <div className="mt-4 text-center">
+          <div className="text-xs text-slate-600">
+            <span className="text-blue-600 font-medium">Kliknij segment aby zobaczyć listę klientów</span>
           </div>
         </div>
       </div>
