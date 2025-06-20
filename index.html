@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -374,6 +373,82 @@
             color: #6b7280;
         }
 
+        /* Tooltip Styles */
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .chart-tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chart-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+        }
+
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .client-table th,
+        .client-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .client-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .client-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .client-name {
+            color: #2563eb;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .client-name:hover {
+            color: #1d4ed8;
+        }
+
+        .revenue-cell {
+            text-align: right;
+        }
+
+        .more-clients {
+            text-align: center;
+            font-style: italic;
+            color: #6b7280;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -631,12 +706,78 @@
                     <div class="bar-container">
                         <div class="bar" 
                              style="height: ${height}px; background-color: ${data.color}"
-                             title="${data.segment}: ${formatCurrency(data.revenue)}">
+                             data-segment="${data.segment}"
+                             data-revenue="${data.revenue}">
                         </div>
                         <div class="bar-label">${data.segment}</div>
                     </div>
                 `;
             }).join('');
+
+            // Add tooltip functionality
+            const bars = chart.querySelectorAll('.bar');
+            bars.forEach(bar => {
+                bar.addEventListener('mouseenter', (e) => showBarTooltip(e));
+                bar.addEventListener('mouseleave', hideBarTooltip);
+                bar.addEventListener('mousemove', (e) => updateTooltipPosition(e));
+            });
+        }
+
+        function showBarTooltip(event) {
+            const bar = event.target;
+            const segment = bar.dataset.segment;
+            const revenue = parseInt(bar.dataset.revenue);
+            
+            // Create tooltip if it doesn't exist
+            let tooltip = document.getElementById('barTooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'barTooltip';
+                tooltip.className = 'chart-tooltip';
+                document.body.appendChild(tooltip);
+            }
+            
+            // Set tooltip content
+            tooltip.innerHTML = `${segment}: ${formatCurrency(revenue)}`;
+            
+            // Position tooltip
+            updateTooltipPosition(event);
+            
+            // Show tooltip
+            setTimeout(() => {
+                tooltip.classList.add('show');
+            }, 10);
+        }
+
+        function hideBarTooltip() {
+            const tooltip = document.getElementById('barTooltip');
+            if (tooltip) {
+                tooltip.classList.remove('show');
+            }
+        }
+
+        function updateTooltipPosition(event) {
+            const tooltip = document.getElementById('barTooltip');
+            if (!tooltip) return;
+            
+            const rect = event.target.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            // Position above the bar
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            let top = rect.top - tooltipRect.height - 10;
+            
+            // Keep tooltip within viewport
+            if (left < 10) left = 10;
+            if (left + tooltipRect.width > window.innerWidth - 10) {
+                left = window.innerWidth - tooltipRect.width - 10;
+            }
+            if (top < 10) {
+                top = rect.bottom + 10;
+            }
+            
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
         }
 
         // Event handlers
