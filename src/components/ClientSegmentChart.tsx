@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Users, TrendingUp, AlertTriangle, UserCheck, X } from 'lucide-react';
+import { Users, TrendingUp, AlertTriangle, UserCheck, Download } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 
 interface ClientSegment {
   name: string;
@@ -35,7 +36,7 @@ const ClientSegmentChart = () => {
 
   const totalClients = segments.reduce((sum, segment) => sum + segment.count, 0);
 
-  // Generowanie przykładowych danych klientów
+  // Generate sample client data
   const generateClientsForSegment = (segment: ClientSegment): Client[] => {
     const clients: Client[] = [];
     const baseRevenue = {
@@ -50,12 +51,40 @@ const ClientSegmentChart = () => {
     for (let i = 1; i <= Math.min(segment.count, 20); i++) {
       clients.push({
         id: `${segment.name.toLowerCase()}-${i}`,
-        name: `Klient ${segment.name} ${i}`,
-        email: `klient${i}@${segment.name.toLowerCase()}.com`,
+        name: `Client ${segment.name} ${i}`,
+        email: `client${i}@${segment.name.toLowerCase()}.com`,
         revenue: baseRevenue[segment.name as keyof typeof baseRevenue] + Math.random() * 10000
       });
     }
     return clients;
+  };
+
+  const downloadClientList = (segment: ClientSegment) => {
+    const clients = generateClientsForSegment(segment);
+    const csvContent = [
+      ['Name', 'Email', 'Revenue (PLN)'],
+      ...clients.map(client => [
+        client.name,
+        client.email,
+        client.revenue.toFixed(2)
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${segment.name}_clients.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleClientClick = (client: Client) => {
+    // Open a sample link in new tab - replace with actual client profile URL
+    const clientUrl = `https://example.com/client/${client.id}`;
+    window.open(clientUrl, '_blank');
   };
 
   const getSegmentRadius = (priority: number) => {
@@ -82,14 +111,14 @@ const ClientSegmentChart = () => {
     <>
       <div className="w-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 shadow-lg border border-slate-200">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-slate-800">Segmentacja Klientów</h3>
+          <h3 className="text-lg font-semibold text-slate-800">Client Segmentation</h3>
           <div className="text-sm text-slate-600">
-            Łącznie: {totalClients.toLocaleString('pl-PL')} klientów
+            Total: {totalClients.toLocaleString('en-US')} clients
           </div>
         </div>
         
         <div className="relative flex items-center justify-center h-56">
-          {/* Koncentryczne kręgi - układ teleskopowy */}
+          {/* Concentric circles - telescopic layout */}
           <svg width="220" height="220" className="absolute">
             {segments.map((segment, index) => {
               const radius = getSegmentRadius(segment.priority);
@@ -104,7 +133,7 @@ const ClientSegmentChart = () => {
               
               return (
                 <g key={segment.name}>
-                  {/* Tło pierścienia */}
+                  {/* Ring background */}
                   <circle
                     cx="110"
                     cy="110"
@@ -115,7 +144,7 @@ const ClientSegmentChart = () => {
                     opacity="0.3"
                   />
                   
-                  {/* Aktywny segment */}
+                  {/* Active segment */}
                   <circle
                     cx="110"
                     cy="110"
@@ -141,7 +170,7 @@ const ClientSegmentChart = () => {
             })}
           </svg>
 
-          {/* Centralny punkt z informacją */}
+          {/* Central point with information */}
           <div className="absolute bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg border-2 border-slate-200">
             <div className="text-center">
               <div className="text-xs font-bold text-slate-800">{segments.length}</div>
@@ -150,7 +179,7 @@ const ClientSegmentChart = () => {
           </div>
         </div>
 
-        {/* Uporządkowana lista segmentów */}
+        {/* Ordered segment list */}
         <div className="mt-4 grid grid-cols-2 gap-3">
           {segments.map((segment) => (
             <div
@@ -168,7 +197,7 @@ const ClientSegmentChart = () => {
                 <div className="text-sm font-medium text-slate-700">{segment.name}</div>
               </div>
               <div className="text-lg font-bold text-slate-800">
-                {segment.count.toLocaleString('pl-PL')}
+                {segment.count.toLocaleString('en-US')}
               </div>
               <div className="text-xs text-slate-500">
                 {((segment.count / totalClients) * 100).toFixed(1)}%
@@ -177,29 +206,42 @@ const ClientSegmentChart = () => {
           ))}
         </div>
 
-        {/* Informacja o interakcji */}
+        {/* Interaction information */}
         <div className="mt-4 text-center">
           <div className="text-xs text-slate-600">
-            <span className="text-blue-600 font-medium">Kliknij segment aby zobaczyć listę klientów</span>
+            <span className="text-blue-600 font-medium">Click segment to view client list</span>
           </div>
         </div>
       </div>
 
-      {/* Dialog z listą klientów */}
+      {/* Dialog with client list */}
       <Dialog open={showClientList} onOpenChange={setShowClientList}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 justify-between">
+              <div className="flex items-center gap-2">
+                {selectedSegment && (
+                  <>
+                    <div style={{ color: selectedSegment.color }}>
+                      {selectedSegment.icon}
+                    </div>
+                    Clients - {selectedSegment.name}
+                    <span className="text-sm font-normal text-gray-500">
+                      ({selectedSegment.count.toLocaleString('en-US')} clients)
+                    </span>
+                  </>
+                )}
+              </div>
               {selectedSegment && (
-                <>
-                  <div style={{ color: selectedSegment.color }}>
-                    {selectedSegment.icon}
-                  </div>
-                  Klienci - {selectedSegment.name}
-                  <span className="text-sm font-normal text-gray-500">
-                    ({selectedSegment.count.toLocaleString('pl-PL')} klientów)
-                  </span>
-                </>
+                <Button
+                  onClick={() => downloadClientList(selectedSegment)}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download CSV
+                </Button>
               )}
             </DialogTitle>
           </DialogHeader>
@@ -209,18 +251,24 @@ const ClientSegmentChart = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Nazwa</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead className="text-right">Przychód (PLN)</TableHead>
+                    <TableHead className="text-right">Revenue (PLN)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {generateClientsForSegment(selectedSegment).map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">{client.name}</TableCell>
+                    <TableRow 
+                      key={client.id} 
+                      className="cursor-pointer hover:bg-slate-50"
+                      onClick={() => handleClientClick(client)}
+                    >
+                      <TableCell className="font-medium text-blue-600 hover:text-blue-800">
+                        {client.name}
+                      </TableCell>
                       <TableCell>{client.email}</TableCell>
                       <TableCell className="text-right">
-                        {client.revenue.toLocaleString('pl-PL', {
+                        {client.revenue.toLocaleString('en-US', {
                           style: 'currency',
                           currency: 'PLN'
                         })}
@@ -230,7 +278,7 @@ const ClientSegmentChart = () => {
                   {selectedSegment.count > 20 && (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center text-gray-500 italic">
-                        ... i {(selectedSegment.count - 20).toLocaleString('pl-PL')} więcej klientów
+                        ... and {(selectedSegment.count - 20).toLocaleString('en-US')} more clients
                       </TableCell>
                     </TableRow>
                   )}
