@@ -1,24 +1,790 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>telescopic-client-chart</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <meta property="og:title" content="telescopic-client-chart" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            min-height: 100vh;
+            background: #f8fafc;
+            padding: 16px;
+        }
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+        .container {
+            max-width: 660px;
+            margin: 0 auto;
+        }
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 24px;
+        }
+
+        .chart-container {
+            width: 100%;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .total-clients {
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .circle-chart {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 224px;
+        }
+
+        .circle-svg {
+            position: absolute;
+        }
+
+        .circle-center {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e2e8f0;
+        }
+
+        .circle-center-text {
+            text-align: center;
+        }
+
+        .circle-center-count {
+            font-size: 12px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .circle-center-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .segment-grid {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .segment-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-left-width: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .segment-card:hover {
+            border-color: #64748b;
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .segment-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .segment-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .segment-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .segment-count {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .segment-percentage {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .click-instruction {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #4b5563;
+        }
+
+        .click-text {
+            color: #2563eb;
+            font-weight: 500;
+        }
+
+        .revenue-chart {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .revenue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .revenue-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .revenue-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .chart-icon {
+            width: 20px;
+            height: 20px;
+            color: #94a3b8;
+        }
+
+        .bar-chart {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 0 10px;
+        }
+
+        .bar-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar {
+            width: 100%;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .bar:hover {
+            filter: brightness(1.1);
+            transform: scaleY(1.05);
+        }
+
+        .bar-label {
+            font-size: 10px;
+            color: #6b7280;
+            text-align: center;
+            transform: rotate(-45deg);
+            white-space: nowrap;
+            margin-top: 8px;
+        }
+
+        .revenue-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .total-revenue {
+            color: #64748b;
+        }
+
+        .revenue-highlight {
+            color: #7c3aed;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 4px;
+        }
+
+        .modal-close:hover {
+            color: #374151;
+        }
+
+        .download-btn {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .client-table th,
+        .client-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .client-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .client-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .client-name {
+            color: #2563eb;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .client-name:hover {
+            color: #1d4ed8;
+        }
+
+        .revenue-cell {
+            text-align: right;
+        }
+
+        .more-clients {
+            text-align: center;
+            font-style: italic;
+            color: #6b7280;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 8px;
+            }
+            
+            .segment-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="dashboard-title">Client Dashboard</h1>
+        
+        <!-- Client Segmentation Chart -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Client Segmentation</h3>
+                <div class="total-clients" id="totalClients">Total: 0 clients</div>
+            </div>
+            
+            <div class="circle-chart">
+                <svg width="220" height="220" class="circle-svg" id="circleChart"></svg>
+                <div class="circle-center">
+                    <div class="circle-center-text">
+                        <div class="circle-center-count" id="segmentCount">6</div>
+                        <div class="circle-center-label">seg.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="segment-grid" id="segmentGrid"></div>
+
+            <div class="click-instruction">
+                <span class="click-text">Click segment to view client list</span>
+            </div>
+        </div>
+
+        <!-- Revenue Segmentation Chart -->
+        <div class="revenue-chart">
+            <div class="revenue-header">
+                <div>
+                    <div class="revenue-title">Revenue Segmentation</div>
+                    <div class="revenue-subtitle">Revenue distribution by client segments</div>
+                </div>
+                <svg class="chart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="M18 17V9"/>
+                    <path d="M13 17V5"/>
+                    <path d="M8 17v-3"/>
+                </svg>
+            </div>
+            <div class="bar-chart" id="barChart"></div>
+            <div class="revenue-summary">
+                <div class="total-revenue">
+                    Total revenue: <span style="font-weight: 600;">2,450,000 PLN</span>
+                </div>
+                <div class="revenue-highlight">79.6% from top 3 segments</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">
+                    <!-- Dynamic title -->
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button class="download-btn" id="downloadBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download CSV
+                    </button>
+                    <button class="modal-close" id="modalClose">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <table class="client-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th class="revenue-cell">Revenue (PLN)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientTableBody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const segments = [
+            { name: 'Inactive', count: 43534, color: '#6B7280', icon: '👥', priority: 6 },
+            { name: 'At Risk', count: 3036, color: '#EF4444', icon: '⚠️', priority: 5 },
+            { name: 'To Develop', count: 1416, color: '#4F46E5', icon: '📈', priority: 4 },
+            { name: 'Strong', count: 32, color: '#CD7F32', icon: '👥', priority: 3 },
+            { name: 'VIP', count: 29, color: '#C0C0C0', icon: '📈', priority: 2 },
+            { name: 'Platinum', count: 5, color: '#FFD700', icon: '✅', priority: 1 }
+        ];
+
+        const revenueData = [
+            { segment: 'Platinum', revenue: 500000, percentage: 20.4, color: '#FFD700' },
+            { segment: 'VIP', revenue: 1450000, percentage: 59.2, color: '#C0C0C0' },
+            { segment: 'Strong', revenue: 320000, percentage: 13.1, color: '#CD7F32' },
+            { segment: 'To Develop', revenue: 141600, percentage: 5.8, color: '#4F46E5' },
+            { segment: 'At Risk', revenue: 30360, percentage: 1.2, color: '#EF4444' },
+            { segment: 'Inactive', revenue: 8040, percentage: 0.3, color: '#6B7280' }
+        ];
+
+        // State
+        let hoveredSegment = null;
+        let selectedSegment = null;
+
+        // Utility functions
+        function formatNumber(num) {
+            return num.toLocaleString('en-US');
+        }
+
+        function formatCurrency(num) {
+            return num.toLocaleString('en-US', { style: 'currency', currency: 'PLN' });
+        }
+
+        // Initialize app
+        function init() {
+            const totalClients = segments.reduce((sum, segment) => sum + segment.count, 0);
+            document.getElementById('totalClients').textContent = `Total: ${formatNumber(totalClients)} clients`;
+            
+            renderCircleChart();
+            renderSegmentGrid();
+            renderBarChart();
+            setupEventListeners();
+        }
+
+        // Render circle chart
+        function renderCircleChart() {
+            const svg = document.getElementById('circleChart');
+            svg.innerHTML = '';
+            
+            const totalClients = segments.reduce((sum, segment) => sum + segment.count, 0);
+
+            segments.forEach((segment, index) => {
+                const radius = getSegmentRadius(segment.priority);
+                const strokeWidth = getSegmentWidth(segment.priority);
+                const circumference = 2 * Math.PI * radius;
+                const percentage = (segment.count / totalClients) * 100;
+                const opacity = getOpacity(segment.priority);
+                
+                const minArcLength = 0.15;
+                const arcLength = Math.max(percentage / 100, minArcLength);
+                const dashArray = `${circumference * arcLength} ${circumference}`;
+                
+                // Background circle
+                const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                bgCircle.setAttribute('cx', '110');
+                bgCircle.setAttribute('cy', '110');
+                bgCircle.setAttribute('r', radius);
+                bgCircle.setAttribute('fill', 'none');
+                bgCircle.setAttribute('stroke', '#E2E8F0');
+                bgCircle.setAttribute('stroke-width', strokeWidth);
+                bgCircle.setAttribute('opacity', '0.3');
+                svg.appendChild(bgCircle);
+                
+                // Segment circle
+                const segmentCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                segmentCircle.setAttribute('cx', '110');
+                segmentCircle.setAttribute('cy', '110');
+                segmentCircle.setAttribute('r', radius);
+                segmentCircle.setAttribute('fill', 'none');
+                segmentCircle.setAttribute('stroke', segment.color);
+                segmentCircle.setAttribute('stroke-width', strokeWidth);
+                segmentCircle.setAttribute('stroke-dasharray', dashArray);
+                segmentCircle.setAttribute('stroke-linecap', 'round');
+                segmentCircle.setAttribute('transform', `rotate(${index * 50 - 90} 110 110)`);
+                segmentCircle.style.opacity = opacity;
+                segmentCircle.style.transition = 'all 0.3s ease';
+                segmentCircle.style.cursor = 'pointer';
+                segmentCircle.dataset.segment = segment.name;
+                
+                segmentCircle.addEventListener('mouseenter', () => handleSegmentHover(segment.name));
+                segmentCircle.addEventListener('mouseleave', () => handleSegmentHover(null));
+                segmentCircle.addEventListener('click', () => handleSegmentClick(segment));
+                
+                svg.appendChild(segmentCircle);
+            });
+        }
+
+        // Helper functions for circle chart
+        function getSegmentRadius(priority) {
+            const baseRadius = 25;
+            const maxRadius = 100;
+            return baseRadius + (priority - 1) * ((maxRadius - baseRadius) / 5);
+        }
+
+        function getSegmentWidth(priority) {
+            return priority >= 4 ? 15 : 12;
+        }
+
+        function getOpacity(priority) {
+            return 1 - (priority - 1) * 0.12;
+        }
+
+        // Render segment grid
+        function renderSegmentGrid() {
+            const grid = document.getElementById('segmentGrid');
+            const totalClients = segments.reduce((sum, segment) => sum + segment.count, 0);
+            
+            grid.innerHTML = segments.map(segment => `
+                <div class="segment-card" 
+                     data-segment="${segment.name}" 
+                     style="border-left-color: ${segment.color}">
+                    <div class="segment-header">
+                        <div class="segment-icon" style="color: ${segment.color}">${segment.icon}</div>
+                        <div class="segment-name">${segment.name}</div>
+                    </div>
+                    <div class="segment-count">${formatNumber(segment.count)}</div>
+                    <div class="segment-percentage">${((segment.count / totalClients) * 100).toFixed(1)}%</div>
+                </div>
+            `).join('');
+
+            // Add event listeners
+            grid.querySelectorAll('.segment-card').forEach(card => {
+                const segmentName = card.dataset.segment;
+                const segment = segments.find(s => s.name === segmentName);
+                
+                card.addEventListener('mouseenter', () => handleSegmentHover(segmentName));
+                card.addEventListener('mouseleave', () => handleSegmentHover(null));
+                card.addEventListener('click', () => handleSegmentClick(segment));
+            });
+        }
+
+        // Render bar chart
+        function renderBarChart() {
+            const chart = document.getElementById('barChart');
+            const maxRevenue = Math.max(...revenueData.map(d => d.revenue));
+            
+            chart.innerHTML = revenueData.map(data => {
+                const height = (data.revenue / maxRevenue) * 180;
+                return `
+                    <div class="bar-container">
+                        <div class="bar" 
+                             style="height: ${height}px; background-color: ${data.color}"
+                             title="${data.segment}: ${formatCurrency(data.revenue)}">
+                        </div>
+                        <div class="bar-label">${data.segment}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Event handlers
+        function handleSegmentHover(segmentName) {
+            hoveredSegment = segmentName;
+            updateHoverEffects();
+        }
+
+        function updateHoverEffects() {
+            // Update circle chart
+            const circles = document.querySelectorAll('#circleChart circle[data-segment]');
+            circles.forEach(circle => {
+                const isHovered = circle.dataset.segment === hoveredSegment;
+                circle.style.filter = isHovered ? 'brightness(1.2) drop-shadow(0 0 6px rgba(0,0,0,0.3))' : 'none';
+                circle.style.strokeWidth = isHovered ? 
+                    parseInt(circle.getAttribute('stroke-width')) + 2 : 
+                    circle.getAttribute('stroke-width');
+            });
+
+            // Update segment cards
+            const cards = document.querySelectorAll('.segment-card');
+            cards.forEach(card => {
+                const isHovered = card.dataset.segment === hoveredSegment;
+                card.style.borderColor = isHovered ? '#64748b' : '#e2e8f0';
+                card.style.transform = isHovered ? 'scale(1.05)' : 'scale(1)';
+                card.style.boxShadow = isHovered ? 
+                    '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 
+                    '0 1px 3px 0 rgba(0, 0, 0, 0.1)';
+            });
+        }
+
+        function handleSegmentClick(segment) {
+            selectedSegment = segment;
+            showModal();
+        }
+
+        // Modal functions
+        function showModal() {
+            if (!selectedSegment) return;
+            
+            const modal = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const tbody = document.getElementById('clientTableBody');
+            
+            title.innerHTML = `
+                <div style="color: ${selectedSegment.color}">${selectedSegment.icon}</div>
+                Clients - ${selectedSegment.name}
+                <span style="font-size: 14px; font-weight: normal; color: #6b7280;">
+                    (${formatNumber(selectedSegment.count)} clients)
+                </span>
+            `;
+            
+            const clients = generateClientsForSegment(selectedSegment);
+            tbody.innerHTML = clients.map(client => `
+                <tr class="client-row" data-client-id="${client.id}">
+                    <td class="client-name">${client.name}</td>
+                    <td>${client.email}</td>
+                    <td class="revenue-cell">${formatCurrency(client.revenue)}</td>
+                </tr>
+            `).join('');
+            
+            if (selectedSegment.count > 20) {
+                tbody.innerHTML += `
+                    <tr>
+                        <td colspan="3" class="more-clients">
+                            ... and ${formatNumber(selectedSegment.count - 20)} more clients
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Add click handlers for client rows
+            tbody.querySelectorAll('.client-row').forEach(row => {
+                row.addEventListener('click', () => {
+                    const clientId = row.dataset.clientId;
+                    window.open(`https://example.com/client/${clientId}`, '_blank');
+                });
+            });
+            
+            modal.classList.add('show');
+        }
+
+        function hideModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
+        function generateClientsForSegment(segment) {
+            const baseRevenue = {
+                'Platinum': 100000,
+                'VIP': 50000,
+                'Strong': 25000,
+                'To Develop': 10000,
+                'At Risk': 5000,
+                'Inactive': 1000
+            };
+
+            const clients = [];
+            for (let i = 1; i <= Math.min(segment.count, 20); i++) {
+                clients.push({
+                    id: `${segment.name.toLowerCase()}-${i}`,
+                    name: `Client ${segment.name} ${i}`,
+                    email: `client${i}@${segment.name.toLowerCase()}.com`,
+                    revenue: baseRevenue[segment.name] + Math.random() * 10000
+                });
+            }
+            return clients;
+        }
+
+        function downloadClientList() {
+            if (!selectedSegment) return;
+            
+            const clients = generateClientsForSegment(selectedSegment);
+            const csvContent = [
+                ['Name', 'Email', 'Revenue (PLN)'],
+                ...clients.map(client => [
+                    client.name,
+                    client.email,
+                    client.revenue.toFixed(2)
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${selectedSegment.name}_clients.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('modalClose').addEventListener('click', hideModal);
+            document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) hideModal();
+            });
+            document.getElementById('downloadBtn').addEventListener('click', downloadClientList);
+            
+            // Keyboard support
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') hideModal();
+            });
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
 </html>
