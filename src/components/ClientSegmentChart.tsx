@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Users, TrendingUp, AlertTriangle, UserCheck, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -59,14 +58,14 @@ const ClientSegmentChart = () => {
   };
 
   const getSegmentRadius = (priority: number) => {
-    const baseRadius = 40;
-    const maxRadius = 180;
+    const baseRadius = 30;
+    const maxRadius = 120;
     return baseRadius + (priority - 1) * ((maxRadius - baseRadius) / 5);
   };
 
   const getSegmentWidth = (priority: number) => {
-    if (priority >= 4) return 25; // Szersze pierścienie dla top segmentów (teraz to są wewnętrzne)
-    return 20;
+    if (priority >= 4) return 18;
+    return 15;
   };
 
   const getOpacity = (priority: number) => {
@@ -81,7 +80,7 @@ const ClientSegmentChart = () => {
 
   return (
     <>
-      <div className="w-full h-96 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 shadow-lg border border-slate-200">
+      <div className="w-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-4 shadow-lg border border-slate-200">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-slate-800">Segmentacja Klientów</h3>
           <div className="text-sm text-slate-600">
@@ -89,9 +88,9 @@ const ClientSegmentChart = () => {
           </div>
         </div>
         
-        <div className="relative flex items-center justify-center h-80">
+        <div className="relative flex items-center justify-center h-64">
           {/* Koncentryczne kręgi - układ teleskopowy z odwróconą kolejnością */}
-          <svg width="360" height="360" className="absolute">
+          <svg width="260" height="260" className="absolute">
             {segments.map((segment, index) => {
               const radius = getSegmentRadius(segment.priority);
               const strokeWidth = getSegmentWidth(segment.priority);
@@ -108,8 +107,8 @@ const ClientSegmentChart = () => {
                 <g key={segment.name}>
                   {/* Tło pierścienia */}
                   <circle
-                    cx="180"
-                    cy="180"
+                    cx="130"
+                    cy="130"
                     r={radius}
                     fill="none"
                     stroke="#E2E8F0"
@@ -119,20 +118,20 @@ const ClientSegmentChart = () => {
                   
                   {/* Aktywny segment */}
                   <circle
-                    cx="180"
-                    cy="180"
+                    cx="130"
+                    cy="130"
                     r={radius}
                     fill="none"
                     stroke={segment.color}
                     strokeWidth={strokeWidth}
                     strokeDasharray={dashArray}
                     strokeLinecap="round"
-                    transform={`rotate(${index * 60 - 90} 180 180)`}
+                    transform={`rotate(${index * 60 - 90} 130 130)`}
                     className="transition-all duration-300 cursor-pointer"
                     style={{
                       opacity: opacity,
                       filter: hoveredSegment === segment.name ? 'brightness(1.2) drop-shadow(0 0 8px rgba(0,0,0,0.3))' : 'none',
-                      strokeWidth: hoveredSegment === segment.name ? strokeWidth + 3 : strokeWidth
+                      strokeWidth: hoveredSegment === segment.name ? strokeWidth + 2 : strokeWidth
                     }}
                     onMouseEnter={() => setHoveredSegment(segment.name)}
                     onMouseLeave={() => setHoveredSegment(null)}
@@ -144,10 +143,10 @@ const ClientSegmentChart = () => {
           </svg>
 
           {/* Centralny punkt z informacją */}
-          <div className="absolute bg-white rounded-full w-20 h-20 flex items-center justify-center shadow-lg border-2 border-slate-200">
+          <div className="absolute bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg border-2 border-slate-200">
             <div className="text-center">
               <div className="text-xs font-medium text-slate-600">Klienci</div>
-              <div className="text-lg font-bold text-slate-800">{segments.length}</div>
+              <div className="text-sm font-bold text-slate-800">{segments.length}</div>
               <div className="text-xs text-slate-500">segmentów</div>
             </div>
           </div>
@@ -155,9 +154,9 @@ const ClientSegmentChart = () => {
           {/* Interaktywne etykiety */}
           {segments.map((segment, index) => {
             const angle = (index * 60) * (Math.PI / 180);
-            const labelRadius = getSegmentRadius(segment.priority) + 40;
-            const x = 180 + labelRadius * Math.cos(angle - Math.PI / 2);
-            const y = 180 + labelRadius * Math.sin(angle - Math.PI / 2);
+            const labelRadius = getSegmentRadius(segment.priority) + 35;
+            const x = 130 + labelRadius * Math.cos(angle - Math.PI / 2);
+            const y = 130 + labelRadius * Math.sin(angle - Math.PI / 2);
             
             return (
               <div
@@ -174,7 +173,7 @@ const ClientSegmentChart = () => {
                 onMouseLeave={() => setHoveredSegment(null)}
                 onClick={() => handleSegmentClick(segment)}
               >
-                <div className={`bg-white rounded-lg shadow-md p-2 border-2 cursor-pointer min-w-20 ${
+                <div className={`bg-white rounded-lg shadow-md p-2 border-2 cursor-pointer min-w-16 ${
                   hoveredSegment === segment.name ? 'border-slate-400 shadow-lg' : 'border-slate-200'
                 }`} style={{ borderLeftColor: segment.color, borderLeftWidth: '4px' }}>
                   <div className="flex items-center gap-1 mb-1">
