@@ -69,7 +69,6 @@ const SalesChart = () => {
                 stroke="#10B981" 
                 strokeWidth={2}
                 dot={{ fill: "#10B981", strokeWidth: 2, r: 3 }}
-                yAxisId="right"
               />
             </LineChart>
           </ResponsiveContainer>
