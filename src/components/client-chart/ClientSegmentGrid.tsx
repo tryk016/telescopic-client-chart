@@ -30,7 +30,6 @@ const ClientSegmentGrid: React.FC<ClientSegmentGridProps> = ({
           style={{
             backgroundColor: 'white',
             borderRadius: '8px',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
             padding: '12px',
             border: hoveredSegment === segment.name ? '2px solid #64748b' : '2px solid #e2e8f0',
             borderLeftColor: segment.color,
