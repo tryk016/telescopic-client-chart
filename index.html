@@ -215,14 +215,23 @@
         .bar {
             width: 100%;
             border-radius: 4px 4px 0 0;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
             position: relative;
         }
 
-        .bar:hover {
+        .bar-container:hover .bar {
+            background-color: #9CA3AF !important;
             filter: brightness(1.1);
-            transform: scaleY(1.05);
+            transform: scaleY(1.02);
+        }
+
+        .bar-container:hover {
+            cursor: pointer;
+        }
+
+        .bar-container:hover .bar-label {
+            color: #9CA3AF;
         }
 
         .bar-label {
@@ -703,30 +712,28 @@
             chart.innerHTML = revenueData.map(data => {
                 const height = (data.revenue / maxRevenue) * 180;
                 return `
-                    <div class="bar-container">
+                    <div class="bar-container" data-segment="${data.segment}" data-revenue="${data.revenue}">
                         <div class="bar" 
-                             style="height: ${height}px; background-color: ${data.color}"
-                             data-segment="${data.segment}"
-                             data-revenue="${data.revenue}">
+                             style="height: ${height}px; background-color: ${data.color}">
                         </div>
                         <div class="bar-label">${data.segment}</div>
                     </div>
                 `;
             }).join('');
 
-            // Add tooltip functionality
-            const bars = chart.querySelectorAll('.bar');
-            bars.forEach(bar => {
-                bar.addEventListener('mouseenter', (e) => showBarTooltip(e));
-                bar.addEventListener('mouseleave', hideBarTooltip);
-                bar.addEventListener('mousemove', (e) => updateTooltipPosition(e));
+            // Add tooltip functionality - moved to bar-container
+            const barContainers = chart.querySelectorAll('.bar-container');
+            barContainers.forEach(container => {
+                container.addEventListener('mouseenter', (e) => showBarTooltip(e));
+                container.addEventListener('mouseleave', hideBarTooltip);
+                container.addEventListener('mousemove', (e) => updateTooltipPosition(e));
             });
         }
 
         function showBarTooltip(event) {
-            const bar = event.target;
-            const segment = bar.dataset.segment;
-            const revenue = parseInt(bar.dataset.revenue);
+            const container = event.currentTarget;
+            const segment = container.dataset.segment;
+            const revenue = parseInt(container.dataset.revenue);
             
             // Create tooltip if it doesn't exist
             let tooltip = document.getElementById('barTooltip');
@@ -760,7 +767,9 @@
             const tooltip = document.getElementById('barTooltip');
             if (!tooltip) return;
             
-            const rect = event.target.getBoundingClientRect();
+            const container = event.currentTarget;
+            const bar = container.querySelector('.bar');
+            const rect = bar.getBoundingClientRect();
             const tooltipRect = tooltip.getBoundingClientRect();
             
             // Position above the bar
